@@ -8,6 +8,8 @@ return [
 	'payment_method' => 'Payment Method',
 	'cash' => 'Cash',
 	'debit_card' => 'Debit Card',
+	'debit_ocbc' => 'Debit Card OCBC',
+	'debit_permata' => 'Debit Card Permata',
 	'credit_card' => 'Credit Card',
 	'transfer' => 'Transfer',
 	'date' => 'Date',

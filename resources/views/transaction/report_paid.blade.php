@@ -23,6 +23,7 @@
                     </td>
                 </tr>
             </table>
+            @if($countPaidTunai > 0 )
 
             <table width="100%" class="table-bordered text-center">
             <tr>
@@ -34,7 +35,6 @@
                 <td rowspan="2">UANG MASUK</td>
                 <td colspan="5">ANGSURAN</td>
                 <td colspan="3">TEMPO</td>
-                <td rowspan="2">TOTAL</td>
                 <td rowspan="2">SISA</td>
             </tr>
             <tr>
@@ -58,8 +58,13 @@
             $totalsisa=0;
             $totalBtempo=0;
             $totalPtempo=0;
+            $sisa = 0;
             @endphp
             @foreach($paidData as $paid)
+                @if($paid->pay_method == 'Tunai')
+                @php
+                $sisa = $paid->transfer_in - ($paid->t_installment + $paid->saving + $paid->t_tempo)
+                @endphp
             <tr>
                 <td style="padding: 1.5em;">{{$no++}}</td>
                 <td>{{$paid->loan_number}}</td>
@@ -71,12 +76,11 @@
                 <td>{{number_format($paid->pay_rates, 0, ',', '.')}}</td>
                 <td>{{number_format($paid->saving, 0, ',', '.')}}</td>
                 <td>0</td>
-                <td>{{number_format($paid->t_installment, 0, ',', '.')}}</td>
+                <td>{{number_format($paid->t_installment + $paid->saving, 0, ',', '.')}}</td>
                 <td>{{number_format($paid->b_tempo, 0, ',', '.')}}</td>
                 <td>{{number_format($paid->p_tempo, 0, ',', '.')}}</td>
                 <td>{{number_format($paid->t_tempo, 0, ',', '.')}}</td>
-                <td>{{number_format($paid->t_installment, 0, ',', '.')}}</td>
-                <td>{{number_format($paid->sisa, 0, ',', '.')}}</td>
+                <td>{{number_format($sisa, 0, ',', '.')}}</td>
             </tr>
             @php
             $totalTransferin += $paid->transfer_in;
@@ -89,6 +93,7 @@
             $totalttempo += $paid->t_tempo;
             $totalsisa += $paid->sisa;
             @endphp
+                    @endif
             @endforeach
             <tr>
                 <td colspan="5">TOTAL</td>
@@ -97,14 +102,291 @@
                 <td>{{number_format($totalPayRate, 0, ',', '.')}}</td>
                 <td>{{number_format($totalSaving, 0, ',', '.')}}</td>
                 <td>0</td>
-                <td>{{number_format($totaltinstall, 0, ',', '.')}}</td>
+                <td>{{number_format($totaltinstall + $totalSaving, 0, ',', '.')}}</td>
                 <td>{{number_format($totalBtempo, 0, ',', '.')}}</td>
                 <td>{{number_format($totalPtempo, 0, ',', '.')}}</td>
                 <td>{{number_format($totalttempo, 0, ',', '.')}}</td>
-                <td>{{number_format($totaltinstall, 0, ',', '.')}}</td>
                 <td>{{number_format($totalsisa, 0, ',', '.')}}</td>
             </tr>
             </table>
+            @endif
+
+{{--            Kartu DEBET --}}
+
+            <br>
+            <br>
+            <br>
+            @if($countPaidKartuDebet > 0)
+
+            <table width="100%" class="table-bordered text-center">
+                <tr>
+                    <td rowspan="2" style="padding: 1.5em;">NO</td>
+                    <td rowspan="2">NO PINJAMAN</td>
+                    <td rowspan="2">NAMA</td>
+                    <td rowspan="2">NO TAB</td>
+                    <td rowspan="2">CARA BAYAR</td>
+                    <td rowspan="2">UANG MASUK</td>
+                    <td colspan="5">ANGSURAN</td>
+                    <td colspan="3">TEMPO</td>
+                    <td rowspan="2">SISA</td>
+                </tr>
+                <tr>
+                    <td style="padding: 1.5em;">POKOK</td>
+                    <td>BUNGA</td>
+                    <td>TABUNGAN</td>
+                    <td>DENDA</td>
+                    <td>TOTAL</td>
+                    <td>BUNGA TEMPO</td>
+                    <td>POKOK TEMPO</td>
+                    <td>TOTAL TEMPO</td>
+                </tr>
+                @php
+                    $no = 1;
+                    $totalTransferin = 0;
+                    $totalPayPrincipal =0;
+                    $totalPayRate=0;
+                    $totalSaving=0;
+                    $totaltinstall=0;
+                    $totalttempo=0;
+                    $totalsisa=0;
+                    $totalBtempo=0;
+                    $totalPtempo=0;
+                    $sisa = 0;
+                @endphp
+                @foreach($paidData as $paid)
+                    @if($paid->pay_method == 'Kartu Debet')
+                        @php
+                            $sisa = $paid->transfer_in - ($paid->t_installment + $paid->saving + $paid->t_tempo)
+                        @endphp
+                        <tr>
+                            <td style="padding: 1.5em;">{{$no++}}</td>
+                            <td>{{$paid->loan_number}}</td>
+                            <td>{{$paid->name}}</td>
+                            <td>{{$paid->member_number}}</td>
+                            <td>{{$paid->pay_method}}</td>
+                            <td>{{number_format($paid->transfer_in, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->pay_principal, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->pay_rates, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->saving, 0, ',', '.')}}</td>
+                            <td>0</td>
+                            <td>{{number_format($paid->t_installment + $paid->saving, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->b_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->p_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->t_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($sisa, 0, ',', '.')}}</td>
+                        </tr>
+                        @php
+                            $totalTransferin += $paid->transfer_in;
+                            $totalPayPrincipal += $paid->pay_principal;
+                            $totalPayRate += $paid->pay_rates;
+                            $totalSaving += $paid->saving;
+                            $totaltinstall += $paid->t_installment;
+                            $totalBtempo += $paid->b_tempo;
+                            $totalPtempo += $paid->p_tempo;
+                            $totalttempo += $paid->t_tempo;
+                            $totalsisa += $paid->sisa;
+                        @endphp
+                    @endif
+                @endforeach
+                <tr>
+                    <td colspan="5">TOTAL</td>
+                    <td>{{number_format($totalTransferin, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPayPrincipal, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPayRate, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalSaving, 0, ',', '.')}}</td>
+                    <td>0</td>
+                    <td>{{number_format($totaltinstall + $totalSaving, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalBtempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPtempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalttempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalsisa, 0, ',', '.')}}</td>
+                </tr>
+            </table>
+            @endif
+
+            <br>
+            <br>
+            <br>
+{{--            Kartu DEBET OCBC--}}
+            @if($countKartuOCBC > 0)
+
+            <table width="100%" class="table-bordered text-center">
+                <tr>
+                    <td rowspan="2" style="padding: 1.5em;">NO</td>
+                    <td rowspan="2">NO PINJAMAN</td>
+                    <td rowspan="2">NAMA</td>
+                    <td rowspan="2">NO TAB</td>
+                    <td rowspan="2">CARA BAYAR</td>
+                    <td rowspan="2">UANG MASUK</td>
+                    <td colspan="5">ANGSURAN</td>
+                    <td colspan="3">TEMPO</td>
+                    <td rowspan="2">SISA</td>
+                </tr>
+                <tr>
+                    <td style="padding: 1.5em;">POKOK</td>
+                    <td>BUNGA</td>
+                    <td>TABUNGAN</td>
+                    <td>DENDA</td>
+                    <td>TOTAL</td>
+                    <td>BUNGA TEMPO</td>
+                    <td>POKOK TEMPO</td>
+                    <td>TOTAL TEMPO</td>
+                </tr>
+                @php
+                    $no = 1;
+                    $totalTransferin = 0;
+                    $totalPayPrincipal =0;
+                    $totalPayRate=0;
+                    $totalSaving=0;
+                    $totaltinstall=0;
+                    $totalttempo=0;
+                    $totalsisa=0;
+                    $totalBtempo=0;
+                    $totalPtempo=0;
+                    $sisa = 0;
+                @endphp
+                @foreach($paidData as $paid)
+                    @if($paid->pay_method == 'Kartu Debet OCBC')
+                        @php
+                            $sisa = $paid->transfer_in - ($paid->t_installment + $paid->saving + $paid->t_tempo)
+                        @endphp
+                        <tr>
+                            <td style="padding: 1.5em;">{{$no++}}</td>
+                            <td>{{$paid->loan_number}}</td>
+                            <td>{{$paid->name}}</td>
+                            <td>{{$paid->member_number}}</td>
+                            <td>{{$paid->pay_method}}</td>
+                            <td>{{number_format($paid->transfer_in, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->pay_principal, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->pay_rates, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->saving, 0, ',', '.')}}</td>
+                            <td>0</td>
+                            <td>{{number_format($paid->t_installment + $paid->saving, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->b_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->p_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->t_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($sisa, 0, ',', '.')}}</td>
+                        </tr>
+                        @php
+                            $totalTransferin += $paid->transfer_in;
+                            $totalPayPrincipal += $paid->pay_principal;
+                            $totalPayRate += $paid->pay_rates;
+                            $totalSaving += $paid->saving;
+                            $totaltinstall += $paid->t_installment;
+                            $totalBtempo += $paid->b_tempo;
+                            $totalPtempo += $paid->p_tempo;
+                            $totalttempo += $paid->t_tempo;
+                            $totalsisa += $paid->sisa;
+                        @endphp
+                    @endif
+                @endforeach
+                <tr>
+                    <td colspan="5">TOTAL</td>
+                    <td>{{number_format($totalTransferin, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPayPrincipal, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPayRate, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalSaving, 0, ',', '.')}}</td>
+                    <td>0</td>
+                    <td>{{number_format($totaltinstall + $totalSaving, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalBtempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPtempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalttempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalsisa, 0, ',', '.')}}</td>
+                </tr>
+            </table>
+            @endif
+
+            <br>
+            <br>
+            <br>
+{{--            Kartu DEBET PERMATA--}}
+            @if($countKartuPermata > 0 )
+            <table width="100%" class="table-bordered text-center">
+                <tr>
+                    <td rowspan="2" style="padding: 1.5em;">NO</td>
+                    <td rowspan="2">NO PINJAMAN</td>
+                    <td rowspan="2">NAMA</td>
+                    <td rowspan="2">NO TAB</td>
+                    <td rowspan="2">CARA BAYAR</td>
+                    <td rowspan="2">UANG MASUK</td>
+                    <td colspan="5">ANGSURAN</td>
+                    <td colspan="3">TEMPO</td>
+                    <td rowspan="2">SISA</td>
+                </tr>
+                <tr>
+                    <td style="padding: 1.5em;">POKOK</td>
+                    <td>BUNGA</td>
+                    <td>TABUNGAN</td>
+                    <td>DENDA</td>
+                    <td>TOTAL</td>
+                    <td>BUNGA TEMPO</td>
+                    <td>POKOK TEMPO</td>
+                    <td>TOTAL TEMPO</td>
+                </tr>
+                @php
+                    $no = 1;
+                    $totalTransferin = 0;
+                    $totalPayPrincipal =0;
+                    $totalPayRate=0;
+                    $totalSaving=0;
+                    $totaltinstall=0;
+                    $totalttempo=0;
+                    $totalsisa=0;
+                    $totalBtempo=0;
+                    $totalPtempo=0;
+                    $sisa = 0;
+                @endphp
+                @foreach($paidData as $paid)
+                    @if($paid->pay_method == 'Kartu Debet Permata')
+                        @php
+                            $sisa = $paid->transfer_in - ($paid->t_installment + $paid->saving + $paid->t_tempo)
+                        @endphp
+                        <tr>
+                            <td style="padding: 1.5em;">{{$no++}}</td>
+                            <td>{{$paid->loan_number}}</td>
+                            <td>{{$paid->name}}</td>
+                            <td>{{$paid->member_number}}</td>
+                            <td>{{$paid->pay_method}}</td>
+                            <td>{{number_format($paid->transfer_in, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->pay_principal, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->pay_rates, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->saving, 0, ',', '.')}}</td>
+                            <td>0</td>
+                            <td>{{number_format($paid->t_installment + $paid->saving, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->b_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->p_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($paid->t_tempo, 0, ',', '.')}}</td>
+                            <td>{{number_format($sisa, 0, ',', '.')}}</td>
+                        </tr>
+                        @php
+                            $totalTransferin += $paid->transfer_in;
+                            $totalPayPrincipal += $paid->pay_principal;
+                            $totalPayRate += $paid->pay_rates;
+                            $totalSaving += $paid->saving;
+                            $totaltinstall += $paid->t_installment;
+                            $totalBtempo += $paid->b_tempo;
+                            $totalPtempo += $paid->p_tempo;
+                            $totalttempo += $paid->t_tempo;
+                            $totalsisa += $paid->sisa;
+                        @endphp
+                    @endif
+                @endforeach
+                <tr>
+                    <td colspan="5">TOTAL</td>
+                    <td>{{number_format($totalTransferin, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPayPrincipal, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPayRate, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalSaving, 0, ',', '.')}}</td>
+                    <td>0</td>
+                    <td>{{number_format($totaltinstall + $totalSaving, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalBtempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalPtempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalttempo, 0, ',', '.')}}</td>
+                    <td>{{number_format($totalsisa, 0, ',', '.')}}</td>
+                </tr>
+            </table>
+            @endif
+
             <div class="text-end py-3" id="action">
                     <a href="{{ request()->url() }}?jenis_laporan={{ request()->input('jenis_laporan') }}&date_trx={{ request()->input('date_trx') }}" class="btn btn-sm btn-primary">Back</a>
                     <a href="{{ request()->url() }}?jenis_laporan={{ request()->input('jenis_laporan') }}&date_trx={{ request()->input('date_trx') }}&page=unpaid" class="btn btn-sm btn-primary">Next</a>

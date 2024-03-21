@@ -171,7 +171,7 @@ class TempoController extends Controller
         $companyID = $users->companies[0]->id;
 		DB::beginTransaction();
 		$data = Tempo::where('member_number',$id)->where('status','confirm')->where('is_paid',false)->first();
-		$amountTotal = Tempo::where('member_number',$id)->where('status','confirm')->where('is_paid',false)->sum('total_amount');
+		$amountTotal = Tempo::where('member_number',$id)->where('status','confirm')->where('is_paid',false)->sum('amount');
 		$customer = Customer::where('member_number', $data->member_number)->first();
 		$loanNumber = Loan::where('member_number', $data->member_number)->first();
 

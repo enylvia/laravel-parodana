@@ -264,6 +264,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => [ 'l
 
 	//NERACA SALDO
 	Route::get('/neraca/saldo',[App\Http\Controllers\NeracaSaldoController::class, 'index'])->name('neracasaldo');
+	Route::get('/neraca/index/saldo',[App\Http\Controllers\NeracaSaldoController::class, 'index_saldo'])->name('neraca.index.saldo');
 	Route::get('/neraca/saldo/detail',[App\Http\Controllers\NeracaSaldoController::class, 'detail'])->name('neracasaldo.detail');
 	Route::get('/neraca/saveToBalanceHistory',[App\Http\Controllers\NeracaSaldoController::class, 'saveToBalanceHistory'])->name('neracasaldo.saveToBalanceHistory');
 	Route::get('/neraca/saldo/history',[App\Http\Controllers\NeracaSaldoController::class, 'neracasaldo'])->name('neracasaldo.history');

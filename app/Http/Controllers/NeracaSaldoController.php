@@ -33,6 +33,10 @@ class NeracaSaldoController extends Controller
     {
 		return view('neracasaldo.index');
 	}
+    public function index_saldo()
+    {
+		return view('neracasaldo.index_saldo');
+	}
 	
 	public function detail(Request $request)
     {
@@ -40,6 +44,7 @@ class NeracaSaldoController extends Controller
         $companyID = $users->companies[0]->id;
 
         $start_date = $request->start_date;
+        $formatted_start_date = date('Y-m', strtotime($start_date));
         $end_date = $request->end_date;
         
         $aktivaA  = 1;
@@ -50,69 +55,69 @@ class NeracaSaldoController extends Controller
         $date = Carbon::now()->format('Y-m-d');
         $aktiva = DB::table('account_balance')
             ->where('account_balance.branch', $companyID)
-            ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
                 $join->on('account_balance.account_number', '=', 'transactions.account')
-                ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
+                    ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
             })
             ->where(function ($query) use ($aktivaA) {
                 $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaA]);
             })
             ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
-                SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
-                SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
+        SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
+        SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
             ->orderBy('account_balance.account_number', 'asc')
             ->groupBy('account_balance.account_number')
             ->get();
         // dd($aktiva);
         $pasiva = DB::table('account_balance')
-        ->where('account_balance.branch', $companyID)
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
-        ->where(function ($query) use ($aktivaB,$aktivaC) {
-            $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaB])
-            ->orWhereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaC]);
-        })
-        ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
+            ->where('account_balance.branch', $companyID)
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                    ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
+            ->where(function ($query) use ($aktivaB,$aktivaC) {
+                $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaB])
+                    ->orWhereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaC]);
+            })
+            ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
             SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
             SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
-        ->orderBy('account_balance.account_number', 'asc')
-        ->groupBy('account_balance.account_number')
-        ->get();
+            ->orderBy('account_balance.account_number', 'asc')
+            ->groupBy('account_balance.account_number')
+            ->get();
         // dd($pasiva);
         $dataPendapatan = DB::table('account_balance')
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
-        ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                    ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
+            ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
             SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
             SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
-        ->where('account_balance.branch', $companyID)
-        ->where(function ($query) use ($akunD) {
-            $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$akunD]);
-        })
-        ->orderBy('account_balance.account_number', 'asc')
-        ->groupBy('account_balance.account_number')
-        ->get();
+            ->where('account_balance.branch', $companyID)
+            ->where(function ($query) use ($akunD) {
+                $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$akunD]);
+            })
+            ->orderBy('account_balance.account_number', 'asc')
+            ->groupBy('account_balance.account_number')
+            ->get();
 
 
         $biaya = DB::table('account_balance')
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
-        ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                    ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
+            ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
             SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
             SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
-        ->where('account_balance.branch', $companyID)
-        ->where(function ($query) use ($akunE) {
-            $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$akunE]);
-        })
-        ->orderBy('account_balance.account_number', 'asc')
-        ->groupBy('account_balance.account_number')
-        ->get();
+            ->where('account_balance.branch', $companyID)
+            ->where(function ($query) use ($akunE) {
+                $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$akunE]);
+            })
+            ->orderBy('account_balance.account_number', 'asc')
+            ->groupBy('account_balance.account_number')
+            ->get();
 
         return view('neracasaldo.neracasistem', compact('dataPendapatan','pasiva','aktiva','biaya','request'));
     }
@@ -122,6 +127,7 @@ class NeracaSaldoController extends Controller
         $users = User::with('companies')->where('id', auth()->user()->id)->first();
         $companyID = $users->companies[0]->id;
         $start_date = $request->start_date;
+        $formatted_start_date = date('Y-m', strtotime($start_date));
         $end_date = $request->end_date;
     
         $aktivaA = 1;
@@ -134,12 +140,30 @@ class NeracaSaldoController extends Controller
         // Mengambil data aktiva
         $aktiva = DB::table('account_balance')
             ->where('account_balance.branch', $companyID)
-            ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
                 $join->on('account_balance.account_number', '=', 'transactions.account')
-                ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
+                    ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
             })
             ->where(function ($query) use ($aktivaA) {
                 $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaA]);
+            })
+            ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
+        SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
+        SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
+            ->orderBy('account_balance.account_number', 'asc')
+            ->groupBy('account_balance.account_number')
+            ->get();
+
+        // Mengambil data pasiva
+        $pasiva = DB::table('account_balance')
+            ->where('account_balance.branch', $companyID)
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                    ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
+            ->where(function ($query) use ($aktivaB,$aktivaC) {
+                $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaB])
+                    ->orWhereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaC]);
             })
             ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
             SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
@@ -147,66 +171,42 @@ class NeracaSaldoController extends Controller
             ->orderBy('account_balance.account_number', 'asc')
             ->groupBy('account_balance.account_number')
             ->get();
-    
-        // Mengambil data pasiva
-        $pasiva = DB::table('account_balance')
-        ->where('account_balance.branch', $companyID)
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
-        ->where(function ($query) use ($aktivaB,$aktivaC) {
-            $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaB])
-            ->orWhereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaC]);
-        })
-        ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
-            SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
-            SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
-        ->orderBy('account_balance.account_number', 'asc')
-        ->groupBy('account_balance.account_number')
-        ->get();
-    
+
         // Mengambil data pendapatan
         $dataPendapatan = DB::table('account_balance')
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
-        ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                    ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
+            ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
             SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
             SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
-        ->where('account_balance.branch', $companyID)
-        ->where(function ($query) use ($akunD) {
-            $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$akunD]);
-        })
-        ->orderBy('account_balance.account_number', 'asc')
-        ->groupBy('account_balance.account_number')
-        ->get();
+            ->where('account_balance.branch', $companyID)
+            ->where(function ($query) use ($akunD) {
+                $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$akunD]);
+            })
+            ->orderBy('account_balance.account_number', 'asc')
+            ->groupBy('account_balance.account_number')
+            ->get();
     
         // Mengambil data biaya
         $biaya = DB::table('account_balance')
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
-        ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                    ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
+            ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
             SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
             SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
-        ->where('account_balance.branch', $companyID)
-        ->where(function ($query) use ($akunE) {
-            $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$akunE]);
-        })
-        ->orderBy('account_balance.account_number', 'asc')
-        ->groupBy('account_balance.account_number')
-        ->get();
+            ->where('account_balance.branch', $companyID)
+            ->where(function ($query) use ($akunE) {
+                $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$akunE]);
+            })
+            ->orderBy('account_balance.account_number', 'asc')
+            ->groupBy('account_balance.account_number')
+            ->get();
     
         // // Proses perhitungan jumlah saldo dan mutasi
-        // $sumAktiva = $aktiva->sum('end_balance') - $aktiva->sum('start_balance');
-        // $sumPasiva = $pasiva->sum('end_balance') - $pasiva->sum('start_balance');
-        // $sumPendapatan = $dataPendapatan->sum('end_balance') - $dataPendapatan->sum('start_balance');
-        // $sumBiaya = $biaya->sum('end_balance') - $biaya->sum('start_balance');
-    
-        // $aktivaMinus = $aktiva->sum('debit') - $aktiva->sum('kredit');
     
         // Simpan data ke dalam balance history untuk setiap akun
         foreach ($aktiva as $item) {
@@ -285,6 +285,7 @@ class NeracaSaldoController extends Controller
         $users = User::with('companies')->where('id',auth()->user()->id)->first();
         $companyID = $users->companies[0]->id;
         $start_date = $request->start_date;
+        $formatted_start_date = date('Y-m', strtotime($start_date));
         $end_date = $request->end_date;
 
         $aktivaA  = 1;
@@ -295,26 +296,26 @@ class NeracaSaldoController extends Controller
         $date = Carbon::now()->format('Y-m-d');
         $aktiva = DB::table('account_balance')
             ->where('account_balance.branch', $companyID)
-            ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
                 $join->on('account_balance.account_number', '=', 'transactions.account')
-                ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
+                  ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
             })
             ->where(function ($query) use ($aktivaA) {
                 $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaA]);
             })
             ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
-            SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
-            SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
+        SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
+        SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
             ->orderBy('account_balance.account_number', 'asc')
             ->groupBy('account_balance.account_number')
             ->get();
-        // dd($aktiva);
+
         $pasiva = DB::table('account_balance')
         ->where('account_balance.branch', $companyID)
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                  ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
         ->where(function ($query) use ($aktivaB,$aktivaC) {
             $query->whereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaB])
             ->orWhereRaw("SUBSTRING(account_balance.account_number, 1, 1) = ?", [$aktivaC]);
@@ -327,10 +328,10 @@ class NeracaSaldoController extends Controller
         ->get();
         // dd($pasiva);
         $dataPendapatan = DB::table('account_balance')
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                  ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
         ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
             SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
             SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))
@@ -345,10 +346,10 @@ class NeracaSaldoController extends Controller
         // dd($dataPendapatan);
 
         $biaya = DB::table('account_balance')
-        ->leftJoin('transactions', function ($join) use ($start_date, $end_date) {
-            $join->on('account_balance.account_number', '=', 'transactions.account')
-            ->whereBetween('transactions.date_trx', [$start_date, $end_date]);
-        })
+            ->leftJoin('transactions', function ($join) use ($formatted_start_date) {
+                $join->on('account_balance.account_number', '=', 'transactions.account')
+                  ->where(DB::raw("DATE_FORMAT(transactions.date_trx, '%Y-%m')"), 'like', '%' . $formatted_start_date . '%');
+            })
         ->select(DB::raw("account_balance.account_number, account_balance.start_balance,account_balance.end_balance, transactions.date_trx,transaction_type as type, 
             SUM(CASE WHEN transactions.status = 'd' THEN transactions.amount ELSE 0 END) AS debit, 
             SUM(CASE WHEN transactions.status = 'k' THEN transactions.amount ELSE 0 END) AS kredit"))

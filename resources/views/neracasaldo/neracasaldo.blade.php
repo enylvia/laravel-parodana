@@ -51,7 +51,7 @@
 								$sumAktiva += (($d->start_balance + $d->debit) - $d->kredit);
 							}
 							if ($d->end_balance < 0) {
-								$aktivaMinus += abs(($d->start_balance + $d->debit) - $d->kredit);
+								$aktivaMinus += ($d->start_balance + $d->debit) - $d->kredit;
 							}
 						@endphp
 						@endforeach
@@ -93,8 +93,8 @@
 						<tr>
 							<td></td>
 							<td></td>
-							<td><b>{{number_format($sumAktiva + $sumBiaya)}}</b></td>
-							<td><b>{{number_format($sumPasiva + $sumPendapatan + abs($aktivaMinus))}}</b></td>
+							<td><b>{{number_format($sumAktiva + $sumBiaya + $aktivaMinus)}}</b></td>
+							<td><b>{{number_format($sumPasiva + $sumPendapatan)}}</b></td>
 						</tr>
 					</tbody>
 				</table>

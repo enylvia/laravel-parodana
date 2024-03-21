@@ -33,10 +33,10 @@
 						<label for="name" class="control-label">{{ trans('installment.payment_method') }}</label>						
 							<select name="payment_method" class="form-control" required>
 								<option value="Tunai">{{ trans('installment.cash')}}</option>
-								<option value="Transfer">{{ trans('installment.transfer')}}</option>
-								<option value="Debit">{{ trans('installment.debit_card')}}</option>
-								<option value="Kredit">{{ trans('installment.credit_card')}}</option>
-							</select>						
+								<option value="Kartu Debet">{{ trans('installment.debit_card')}}</option>
+								<option value="Kartu Debet OCBC">{{ trans('installment.debit_ocbc')}}</option>
+								<option value="Kartu Debet Permata">{{ trans('installment.debit_permata')}}</option>
+							</select>
 					</div>
 					<div class="form-group col-md-12 {!! $errors->has('name') ? 'has-error' : '' !!} required ">
 						<label for="name" class="control-label">Status</label>						

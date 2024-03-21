@@ -182,15 +182,6 @@
                         </a>
                     </li>
 
-
-
-                    <!-- <li class="active">
-                        <a href="/neraca/saldo/history">
-                            <i class="fa fa-balance-scale"></i>
-                            <span>Neraca Saldo</span>
-                        </a>
-                    </li> -->
-
                     {{-- <li class="active">
                         <a href="/receipt">
                             <i class="fas fa-file-o"></i>
@@ -325,6 +316,12 @@
                         <a href="/neraca/saldo">
                             <i class="fa fa-balance-scale"></i>
                             <span>Neraca Sistem</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="{{route('neraca.index.saldo')}}">
+                            <i class="fa fa-balance-scale"></i>
+                            <span>Neraca Saldo</span>
                         </a>
                     </li>
                     <li class="active">

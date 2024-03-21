@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CustomerApprove;
 use Illuminate\Http\Request;
 use App\Models\AccountGroup;
 use App\Models\BalanceHistory;
@@ -96,6 +97,7 @@ class JournalController extends Controller
             ->where('installment.status', 'PAID')
             ->where('installment.branch', $companyID)
             ->where('installment.pay_date', $date_trx)
+                ->orderBy('installment.inst_to','ASC')
             ->get();
             $unpaidData = DB::table('installment')
             ->join('customer', 'installment.member_number' ,'=', 'customer.member_number')
@@ -109,18 +111,55 @@ class JournalController extends Controller
             ->select('installment.member_number as member_number','installment.loan_number as loan_number','loans.pay_principal as pay_principal','loans.pay_interest as pay_rates','customer_contract.m_savings as saving','tempos.total_amount as t_tempo','customer.name as name')
             ->where('installment.status', 'UNPAID')
             ->where('installment.due_date', $date_trx)
+                ->orderBy('installment.inst_to','ASC')
             ->get();
+
+        $countPaidTunai = DB::table('installment')
+            ->join('customer', 'installment.member_number', '=', 'customer.member_number')
+            ->where('installment.status', 'PAID')
+            ->where('installment.branch', $companyID)
+            ->where('installment.pay_date', $date_trx)
+            ->where('pay_method', 'Tunai')
+            ->orderBy('installment.inst_to', 'ASC')
+            ->count();
+
+        $countPaidKartuDebet = DB::table('installment')
+            ->join('customer', 'installment.member_number', '=', 'customer.member_number')
+            ->where('installment.status', 'PAID')
+            ->where('installment.branch', $companyID)
+            ->where('installment.pay_date', $date_trx)
+            ->where('pay_method', 'Kartu Debet')
+            ->orderBy('installment.inst_to', 'ASC')
+            ->count();
+
+        $countKartuOCBC = DB::table('installment')
+            ->join('customer', 'installment.member_number', '=', 'customer.member_number')
+            ->where('installment.status', 'PAID')
+            ->where('installment.branch', $companyID)
+            ->where('installment.pay_date', $date_trx)
+            ->where('pay_method', 'Kartu Debet OCBC')
+            ->orderBy('installment.inst_to', 'ASC')
+            ->count();
+
+        $countKartuPermata = DB::table('installment')
+            ->join('customer', 'installment.member_number', '=', 'customer.member_number')
+            ->where('installment.status', 'PAID')
+            ->where('installment.branch', $companyID)
+            ->where('installment.pay_date', $date_trx)
+            ->where('pay_method', 'Kartu Debet Permata')
+            ->orderBy('installment.inst_to', 'ASC')
+            ->count();
 
 
         switch ($request->get("page")) {
                 case "paid" :
-                return view('transaction.report_paid',compact('data','paidData'));
-                break;
+                    return view('transaction.report_paid', compact('data', 'paidData', 'countPaidTunai', 'countPaidKartuDebet', 'countKartuOCBC', 'countKartuPermata'));
+                    break;
                 case "unpaid" :
-                return view('transaction.report_unpaid',compact('data','unpaidData'));
+                    return view('transaction.report_unpaid',compact('data','unpaidData'));
                 break;
                 default:
-                return view('transaction.report_defpage',compact('data','kas'));
+                    return view('transaction.report_defpage',compact('data','kas'));
         }
     }
 
@@ -486,6 +525,7 @@ public function getBukuHutang($id) {
     // Mengambil semua daftar angsuran yang sudah dibayarkan pada table installment
     // mengambil loan amount pada table loans  dan saving pada table saving
     $loan = Loan::where('loan_number', $id)->first();
+    $customerApprove = CustomerApprove::where('customer_id',$loan->customer_id)->first();
     $getSaving = CustomerContract::where('customer_id', $loan->customer_id)->first();
     // kemudian membagi setiap loan sejumlah dengan jumlah time period dan berapa kali bayar
     // lalu mengurangi loan tersebut dengan jumlah yang sudah dibayarkan berdasarkan inst_to atau no angsuran
@@ -691,6 +731,7 @@ public function getBukuHutang($id) {
     $responses = [
         'html' => $response,
         'loan' => $loan,
+        'loan_amount' => $customerApprove->approve_amount,
     ];
     return response()->json($responses);
 }

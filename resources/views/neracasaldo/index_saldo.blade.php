@@ -1,0 +1,34 @@
+@extends('layouts.app')
+@section('content')
+
+    <div class="box">
+        <div class="box-header">
+            <h3>Neraca Saldo</h3>
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <form action="{{route('neracasaldo.history')}}" method="get" enctype="multipart/form-data">
+                    @csrf
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="start_date">Date</label>
+                            <input type="date" class="form-control" name="start_date" id="start_date">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+@section('js')
+    <script type="text/javascript">
+    </script>
+@endsection

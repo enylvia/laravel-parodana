@@ -55,10 +55,10 @@
                 success: function(response) {
                     var htmlData = response.html;
                     var loanData = response.loan;
+                    var approvedAmount = response.loan_amount;
 
                     $('#table-list').html(htmlData);
-                    console.log(loanData.loan_amount);
-                    var formattedLoanAmount = formatCurrency(loanData.loan_amount);
+                    var formattedLoanAmount = formatCurrency(approvedAmount);
                     var formattedPayMonth = formatCurrency(loanData.pay_month);
                     besarPinjaman.textContent = formattedLoanAmount;
                     angsuran.textContent = formattedPayMonth.concat(" x ", loanData.time_period,

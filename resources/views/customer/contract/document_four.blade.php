@@ -73,19 +73,19 @@
                                 II (DUA) Rp. {{ number_format($approveCustomer->approve_amount, 0, ',', '.') }} dengan jasa
                                 atau suku bunga 3% (tiga persen) perbulan flat (secara terus
                                 menerus).</li>
-                            <li>PIHAK KE I (SATU) menyetujui potongan tabungan (Rp {{ number_format($approveCustomer->m_savings) }}) dan biaya
+                            <li>PIHAK KE I (SATU) menyetujui potongan tabungan (Rp {{ number_format($approveCustomer->approve_amount * 0.02) }}) dan biaya
                                 tata laksana 3% dari jumlah pinjaman yang di berikan. Sebagai JAMNAN atas pinjaman yang
                                 diberikan
                                 PIHAK KE 1 (SATU) telah menyerahkan IJAZAH, JAMSOSTEK, BUKU REKENING + ATM PENGGAJIAN dan
                                 selengkapnya tertera di serah terima berkas.</li>
                             <li>PIHAK KE I ( SATU) menyetujui penggesekan ATM atau pengambilan gaji melalui atm penggajian
-                                dan dipotong sesuai Angsuran dengan No Rek: {{ $customer->bank_number }} A/N
-                                {{ $customer->bank_name }}. Saya bersedia menyerahkan
+                                dan dipotong sesuai Angsuran dengan No Rek: {{ $customer->card_number }} A/N
+                                {{ $customer->name }}. Saya bersedia menyerahkan
                                 ATM dan BUKU TABUNGAN tersebut kepada PIHAK KOPERASI SIMPAN PINJAM PARODANA M.</li>
                             <li>Untuk pembayaran pinjaman ini, PIHAK KE I (SATU) bersedia di potong gaji oleh PIHAK KE II (
-                                DUA ) melalui transferan gaji PIHAK KE I (SATU) sebesar Rp {{ $memberNumber->pay_month }} x
+                                DUA ) melalui transferan gaji PIHAK KE I (SATU) sebesar Rp {{ number_format($memberNumber->pay_month + $approveCustomer->m_savings) }} x
                                 {{ $approveCustomer->time_period }} Bulan.</li>
-                            <li>PIHAK KE 1 (SATU) wajib menabung sebesar Rp 48.000 setiap bulannya.</li>
+                            <li>PIHAK KE 1 (SATU) wajib menabung sebesar Rp .......... (41.000 - 100.000) setiap bulannya.</li>
                             <li>Apabila karena hal pembayaran gaji PIHAK KE I ( SATU ) diberhentikan atau PHK baik karena
                                 sebab lain, maka PIHAK KE I ( SATU) WAJIB melunasi pinjaman ( termasuk denda) dari PESANGON
                                 atau dari SALDO JAMSOSTEK. </li>
